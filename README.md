@@ -6,6 +6,7 @@
 
 The project directory structure is as follows:
 
+```shell
 BOTPLATTFORM/
 ├── src/
 │ ├── app/
@@ -32,6 +33,7 @@ BOTPLATTFORM/
 ├── README.md
 ├── pyproject.toml
 ├── test.db
+```
 
 ## Module and Files Overview
 
