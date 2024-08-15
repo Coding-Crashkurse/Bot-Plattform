@@ -1,8 +1,12 @@
 from datetime import datetime, timedelta
-from jose import jwt
+from jose import jwt, JWTError
 from passlib.context import CryptContext
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+from pydantic import BaseModel
 from app.core.config import settings
 
+# Password hashing and verification
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
@@ -14,6 +18,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
+# JWT token creation
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
@@ -27,3 +32,31 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
     return encoded_jwt
+
+
+# OAuth2 password bearer token scheme
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+
+
+# Pydantic model for token data
+class TokenData(BaseModel):
+    user_id: int
+
+
+# Extract user_id from token
+def get_current_user_id(token: str = Depends(oauth2_scheme)) -> int:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        user_id: int = payload.get("user_id")
+        if user_id is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    return user_id
