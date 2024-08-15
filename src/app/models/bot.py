@@ -29,6 +29,7 @@ class Bot(Base):
     image = Column(
         String, default="default.png"
     )  # Standardbild, wenn kein Bild vorhanden ist
+    url = Column(String, nullable=True)  # Add the URL field
 
     # Many-to-Many Beziehung zu Gruppen
     groups = relationship(

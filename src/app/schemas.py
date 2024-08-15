@@ -38,7 +38,6 @@ class User(UserBase):
     id: int
     is_active: bool
     is_admin: bool
-    roles: Optional[List[str]] = []  # Assuming roles are stored as a list of strings
     bots: Optional[List["BotSummary"]] = []  # Forward reference to BotSummary
     group: Optional["GroupSummary"] = None  # Forward reference to GroupSummary
 
@@ -83,6 +82,7 @@ class BotBase(BaseModel):
     name: str
     description: Optional[str] = None
     image: Optional[str] = None
+    url: Optional[str] = None
 
 
 # Bot Creation Schema
@@ -107,5 +107,19 @@ class BotDetail(BotBase):
 class Bot(BotBase):
     id: int
     groups: List[GroupSummary] = []
+
+    model_config = {"from_attributes": True}
+
+
+class UserEmailIdSchema(BaseModel):
+    email: str
+    id: int
+
+    model_config = {"from_attributes": True}
+
+
+class BotIdNameSchema(BaseModel):
+    id: int
+    name: str
 
     model_config = {"from_attributes": True}

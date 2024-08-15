@@ -84,3 +84,24 @@ def get_group(db: Session, group_id: int):
 def get_bots_in_group(db: Session, group_id: int):
     group = db.query(Group).filter(Group.id == group_id).first()
     return group.bots if group else None
+
+
+def assign_bot_to_group(db: Session, bot_id: int, group_id: int) -> Group:
+    bot = db.query(Bot).filter(Bot.id == bot_id).first()
+    group = db.query(Group).filter(Group.id == group_id).first()
+
+    if not bot or not group:
+        return None
+
+    if bot not in group.bots:
+        group.bots.append(bot)
+
+        # Associate the bot with all users in the group
+        for user in group.users:
+            if bot not in user.bots:
+                user.bots.append(bot)
+
+        db.commit()
+        db.refresh(group)
+
+    return group
