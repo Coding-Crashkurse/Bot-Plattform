@@ -1,69 +1,111 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List, TYPE_CHECKING
+
+# Use TYPE_CHECKING to avoid circular imports during runtime
+if TYPE_CHECKING:
+    from app.schemas import BotSummary
 
 
-# Schema für Login-Daten
+# Schema for Login Data
 class Login(BaseModel):
     email: EmailStr
     password: str
 
 
-# Schema für das zurückgegebene Token
+# Schema for Token Response
 class Token(BaseModel):
     access_token: str
     token_type: str
 
 
-# Schema für zusätzliche Daten, die mit dem Token verwendet werden können
+# Schema for Token Data
 class TokenData(BaseModel):
     email: Optional[str] = None
 
 
-# Schema für die Erstellung eines neuen Benutzers
+# Base User Schema
 class UserBase(BaseModel):
-    email: EmailStr
+    email: str
 
 
+# User Creation Schema
 class UserCreate(UserBase):
     password: str
 
 
+# Detailed User Schema
 class User(UserBase):
     id: int
     is_active: bool
     is_admin: bool
+    roles: Optional[List[str]] = []  # Assuming roles are stored as a list of strings
+    bots: Optional[List["BotSummary"]] = []  # Forward reference to BotSummary
+    group: Optional["GroupSummary"] = None  # Forward reference to GroupSummary
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
+# Base Group Schema
+class GroupBase(BaseModel):
+    name: str
+
+
+# Group Creation Schema
+class GroupCreate(GroupBase):
+    pass
+
+
+# Group Summary Schema
+class GroupSummary(GroupBase):
+    id: int
+
+
+# Group Detail Schema (with users and bots)
+class GroupDetail(GroupBase):
+    id: int
+    users: List[User] = []
+    bots: List["BotSummary"] = []
+
+    model_config = {"from_attributes": True}
+
+
+# Main Group Schema
+class Group(GroupBase):
+    id: int
+    users: List[User] = []
+    bots: List["BotSummary"] = []
+
+    model_config = {"from_attributes": True}
+
+
+# Base Bot Schema
 class BotBase(BaseModel):
     name: str
     description: Optional[str] = None
     image: Optional[str] = None
 
 
+# Bot Creation Schema
 class BotCreate(BotBase):
     pass
 
 
+# Bot Summary Schema
+class BotSummary(BotBase):
+    id: int
+
+
+# Bot Detail Schema (with groups)
+class BotDetail(BotBase):
+    id: int
+    groups: List[GroupSummary] = []
+
+    model_config = {"from_attributes": True}
+
+
+# Main Bot Schema
 class Bot(BotBase):
     id: int
+    groups: List[GroupSummary] = []
 
-    class Config:
-        from_attributes = True
-
-
-class GroupBase(BaseModel):
-    name: str
-
-
-class GroupCreate(GroupBase):
-    pass
-
-
-class Group(GroupBase):
-    id: int
-
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}

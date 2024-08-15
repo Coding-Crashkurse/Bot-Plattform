@@ -30,7 +30,10 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
     user = crud_user.get_user(db=db, user_id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return user
+
+    # Convert the SQLAlchemy model to a Pydantic model
+    user_data = schemas.User.model_validate(user, from_attributes=True)
+    return user_data
 
 
 @router.put("/{user_id}", response_model=schemas.User)

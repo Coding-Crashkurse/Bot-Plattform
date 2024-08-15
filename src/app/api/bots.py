@@ -13,6 +13,13 @@ def create_bot(
     bot: schemas.BotCreate,
     db: Session = Depends(get_db),
 ):
+    existing_bot = crud_bot.get_bot_by_name(db=db, name=bot.name)
+    if existing_bot:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A bot with this name already exists.",
+        )
+
     return crud_bot.create_bot(db=db, bot=bot)
 
 
