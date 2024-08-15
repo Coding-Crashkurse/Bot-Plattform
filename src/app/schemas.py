@@ -37,19 +37,33 @@ class User(UserBase):
         from_attributes = True
 
 
-# Schema für die Erstellung eines neuen Bots
 class BotBase(BaseModel):
     name: str
     description: Optional[str] = None
+    image: Optional[str] = None
 
 
 class BotCreate(BotBase):
-    owner_id: int
+    pass
 
 
 class Bot(BotBase):
     id: int
-    owner_id: int
+
+    class Config:
+        from_attributes = True
+
+
+class GroupBase(BaseModel):
+    name: str
+
+
+class GroupCreate(GroupBase):
+    pass
+
+
+class Group(GroupBase):
+    id: int
 
     class Config:
         from_attributes = True

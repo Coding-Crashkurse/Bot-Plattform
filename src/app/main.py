@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api import auth, users, bots
+from app.api import auth, users, bots, groups
 from app.database import engine, Base
 
 # Datenbankinitialisierung (falls nötig)
@@ -11,6 +11,7 @@ app = FastAPI()
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(users.router, prefix="/users", tags=["users"])
 app.include_router(bots.router, prefix="/bots", tags=["bots"])
+app.include_router(groups.router, prefix="/groups", tags=["groups"])
 
 
 @app.get("/")
