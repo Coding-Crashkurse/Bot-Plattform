@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, HttpUrl
 from typing import Optional, List, TYPE_CHECKING
 
 # Use TYPE_CHECKING to avoid circular imports during runtime
@@ -80,9 +80,9 @@ class Group(GroupBase):
 # Base Bot Schema
 class BotBase(BaseModel):
     name: str
-    description: Optional[str] = None
-    image: Optional[str] = None
-    url: Optional[str] = None
+    description: str
+    image: str = "default.png"
+    url: HttpUrl  # Validates that the URL is well-formed
 
 
 # Bot Creation Schema

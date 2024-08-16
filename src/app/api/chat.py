@@ -1,56 +1,55 @@
+import logging
 from fastapi import APIRouter, HTTPException, Depends, Path, Body
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.bot import Bot
 import httpx
-from pydantic import BaseModel
-from typing import Union
 
-
-class SimpleMessage(BaseModel):
-    """Pydantic model focusing only on the content field."""
-
-    content: Union[str, list[Union[str, dict]]]
-    """The string contents of the message."""
-
-    class Config:
-        extra = "allow"  # Allows additional fields if needed
-
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.post("/{bot_id}", response_model=list[SimpleMessage])
+@router.post("/{bot_id}", response_model=dict)
 async def proxy_chat_request(
     bot_id: int = Path(..., description="The ID of the bot to route the request to"),
-    messages: list[SimpleMessage] = Body(
-        ..., description="The list of messages to send to the bot's URL"
-    ),
+    messages=Body(..., description="The list of messages to send to the bot's URL"),
     db: Session = Depends(get_db),
 ):
+    logger.info(f"Received request for bot_id: {bot_id}")
+    logger.info(f"Messages received: {messages}")
+
     bot = db.query(Bot).filter(Bot.id == bot_id).first()
 
     if not bot:
+        logger.error(f"Bot with id {bot_id} not found.")
         raise HTTPException(status_code=404, detail="Bot not found")
 
     if not bot.url:
+        logger.error(f"Bot with id {bot_id} does not have a URL configured.")
         raise HTTPException(
             status_code=400, detail="Bot does not have a URL configured"
         )
 
     async with httpx.AsyncClient() as client:
         try:
-            # Send the list of messages to the bot's URL
-            response = await client.post(
-                bot.url, json=[message.model_dump() for message in messages]
-            )
+            logger.info(f"Sending messages to bot URL: {bot.url}")
+            response = await client.post(bot.url, json=messages)
             response.raise_for_status()
 
-            # Parse and return the response as a list of BaseMessage objects
             response_data = response.json()
-            return [SimpleMessage(**msg) for msg in response_data]
+            logger.info(f"Response received: {response_data}")
+            return response_data  # Return a single dictionary
 
         except httpx.RequestError as exc:
+            logger.error(f"Error communicating with the bot: {exc}")
             raise HTTPException(
                 status_code=500, detail=f"Error communicating with the bot: {str(exc)}"
+            )
+        except httpx.HTTPStatusError as exc:
+            logger.error(
+                f"HTTP error: {exc.response.status_code} - {exc.response.text}"
+            )
+            raise HTTPException(
+                status_code=exc.response.status_code, detail=exc.response.text
             )

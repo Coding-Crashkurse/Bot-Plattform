@@ -42,8 +42,14 @@ def update_bot(bot_id: int, bot: schemas.BotCreate, db: Session = Depends(get_db
     db_bot = crud_bot.get_bot(db=db, bot_id=bot_id)
     if db_bot is None:
         raise HTTPException(status_code=404, detail="Bot not found")
+
     db_bot.name = bot.name
     db_bot.description = bot.description
+    db_bot.image = (
+        bot.image or db_bot.image
+    )  # Preserve the existing image if not provided
+    db_bot.url = str(bot.url)  # Convert HttpUrl to string
+
     db.commit()
     db.refresh(db_bot)
     return db_bot

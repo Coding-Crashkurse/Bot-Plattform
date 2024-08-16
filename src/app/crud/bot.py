@@ -18,7 +18,10 @@ def get_bot_by_name(db: Session, name: str):
 
 def create_bot(db: Session, bot: BotCreate):
     db_bot = Bot(
-        name=bot.name, description=bot.description, image=bot.image or "default.png"
+        name=bot.name,
+        description=bot.description,
+        image=bot.image or "default.png",
+        url=str(bot.url),  # Convert HttpUrl to string
     )
     db.add(db_bot)
     db.commit()
