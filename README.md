@@ -1,54 +1,59 @@
 # BotPlattform
 
-**BotPlattform** is a FastAPI-based web application that allows you to create, manage, and provide various bots to users. The platform offers a RESTful API through which users and administrators can interact with the bots. The application supports user registration, authentication, and role-based access control.
+## Overview
 
-## Directory Structure
+BotPlattform is a comprehensive system that combines a backend built with FastAPI for user registration, role management, bot management, and group assignments, with a simple frontend chat UI built using React. The platform allows users to interact with different bots through a visually appealing card-based interface.
 
-The project directory structure is as follows:
+## Backend (FastAPI)
 
-```shell
-BOTPLATTFORM/
-├── src/
-│ ├── app/
-│ │ ├── api/
-│ │ │ ├── init.py
-│ │ │ ├── auth.py
-│ │ │ ├── bots.py
-│ │ │ ├── users.py
-│ │ ├── core/
-│ │ │ ├── init.py
-│ │ │ ├── config.py
-│ │ │ ├── security.py
-│ │ ├── crud/
-│ │ │ ├── init.py
-│ │ │ ├── bot.py
-│ │ │ ├── user.py
-│ │ ├── models/
-│ │ │ ├── init.py
-│ │ │ ├── bot.py
-│ │ │ ├── user.py
-│ │ │ ├── database.py
-│ │ ├── main.py
-│ │ ├── schemas.py
-├── README.md
-├── pyproject.toml
-├── test.db
-```
+The backend is powered by FastAPI and is responsible for managing users, roles, bots, and groups. The API provides endpoints for:
 
-## Module and Files Overview
+- **User Registration**: Allows new users to register and manage their profiles.
+- **Role Management**: Assigns roles to users to control access to certain features.
+- **Bot Management**: Creates and manages bots that users can interact with.
+- **Group Management**: Organizes bots and users into groups for easier management.
 
-- **`api/`**: Contains the routes for API endpoints that can be accessed by users and administrators. This includes routes for authentication, bot management, and user management.
+### Setup Script (`setup.py`)
 
-- **`core/`**: Contains central configuration and security functions. This includes configurations for the application, security functions such as password hashing, and JWT token creation.
+The `setup.py` script is used to create bots, users, and assign them to groups. This script automates the initial setup process by populating the database with predefined bots and associating them with the appropriate users and groups.
 
-- **`crud/`**: Defines the CRUD operations (Create, Read, Update, Delete) for users and bots, which interact directly with the database.
+## Frontend (React)
 
-- **`models/`**: Contains the SQLAlchemy models representing the database tables. These models define the structure of the database.
+The frontend is a simple chat UI built with React. It provides:
 
-- **`main.py`**: The main application file and entry point for the FastAPI app. This is where the API routers are registered and the application is started.
+- **Bot Cards**: A card for each bot, allowing users to easily select which bot they want to interact with.
+- **Routing to Bots**: When a user selects a bot card, they are routed to the corresponding chat interface where they can interact with the selected bot.
 
-- **`schemas.py`**: Defines the Pydantic schemas for data validation and serialization. These schemas are used to define the structure and types of incoming and outgoing data.
+## Applications
 
-- **`pyproject.toml`**: The project configuration file for Poetry, containing all dependencies and metadata for the project.
+- **testapp1.py**: A simple LLM app demonstrating basic functionality. Start this app using `python testapp1.py`.
+- **testapp2.py**: A second LLM app providing additional features. Start this app using `python testapp2.py`.
 
-- **`test.db`**: A SQLite database file used during development. This can be replaced with another database in a production environment.
+## Getting Started
+
+To get started with BotPlattform:
+
+1. **Install Dependencies**:
+
+   - Run `poetry install` to install the required backend dependencies.
+   - Navigate to the `llm-frontend` directory and run `npm install` to install the required frontend dependencies.
+
+2. **Run the Backend**:
+
+   - Start the FastAPI server to handle backend operations using `uvicorn app.main:app --reload` or the appropriate command for your project.
+
+3. **Run the Frontend**:
+
+   - Navigate to the `llm-frontend` directory and run `npm run dev` to start the React frontend.
+
+4. **Setup Bots**:
+
+   - Run `python setup.py` to initialize bots, users, and assign them to groups.
+
+5. **Start Applications**:
+   - Use `python testapp1.py` to start `testapp1`.
+   - Use `python testapp2.py` to start `testapp2`.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for more details.

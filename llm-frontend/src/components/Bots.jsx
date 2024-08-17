@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const Bots = ({ token }) => {
+const Bots = ({ token, selectedBotId, setSelectedBotId }) => {
   const [bots, setBots] = useState([]);
-  const [selectedBotId, setSelectedBotId] = useState(null); // Change from array to single value
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -17,8 +16,7 @@ const Bots = ({ token }) => {
         const userBots = response.data.bots || [];
         setBots(userBots);
 
-        // Default to selecting the first bot if available
-        if (userBots.length > 0) {
+        if (userBots.length > 0 && !selectedBotId) {
           setSelectedBotId(userBots[0].id);
         }
       } catch (err) {
@@ -27,31 +25,27 @@ const Bots = ({ token }) => {
     };
 
     fetchUserData();
-  }, [token]);
+  }, [token, selectedBotId, setSelectedBotId]);
 
   const selectBot = (botId) => {
-    setSelectedBotId(botId); // Set the selected bot ID
+    setSelectedBotId(botId);
   };
-
-  useEffect(() => {
-    if (selectedBotId) {
-      console.log(`Selected Bot ID: ${selectedBotId}`);
-    }
-  }, [selectedBotId]);
 
   return (
     <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Your Bots</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-700">Your Bots</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {bots.map((bot) => (
           <div
             key={bot.id}
-            className={`card w-40 bg-base-100 shadow-xl cursor-pointer ${
-              selectedBotId === bot.id ? "border-4 border-blue-500" : ""
+            className={`card w-40 bg-white shadow-lg cursor-pointer transition-transform transform hover:scale-105 ${
+              selectedBotId === bot.id
+                ? "border-2 border-gray-500"
+                : "border border-gray-300"
             }`}
             onClick={() => selectBot(bot.id)}
           >
-            <figure className="w-full h-40">
+            <figure className="w-full h-40 bg-gray-100">
               <img
                 src={bot.image}
                 alt={bot.name}
@@ -63,8 +57,8 @@ const Bots = ({ token }) => {
               />
             </figure>
             <div className="card-body p-2 flex flex-col items-center justify-center text-center">
-              <h3 className="card-title text-sm">{bot.name}</h3>
-              <p className="text-xs">{bot.description}</p>
+              <h3 className="card-title text-sm text-gray-700">{bot.name}</h3>
+              <p className="text-xs text-gray-500">{bot.description}</p>
             </div>
           </div>
         ))}

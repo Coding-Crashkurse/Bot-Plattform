@@ -20,6 +20,7 @@ async def proxy_chat_request(
     logger.info(f"Messages received: {messages}")
 
     bot = db.query(Bot).filter(Bot.id == bot_id).first()
+    print("Talking to bot:", bot.name)
 
     if not bot:
         logger.error(f"Bot with id {bot_id} not found.")

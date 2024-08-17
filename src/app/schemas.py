@@ -123,3 +123,32 @@ class BotIdNameSchema(BaseModel):
     name: str
 
     model_config = {"from_attributes": True}
+
+
+# New User schema for the API response
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr
+
+    model_config = {"from_attributes": True}
+
+
+# New Bot schema for the API response
+class BotResponse(BaseModel):
+    id: int
+    name: str
+    description: str
+    image: str
+    url: HttpUrl
+
+    model_config = {"from_attributes": True}
+
+
+# New Group schema for the API response
+class GroupResponse(BaseModel):
+    id: int
+    name: str
+    users: List[UserResponse] = []
+    bots: List[BotResponse] = []
+
+    model_config = {"from_attributes": True}

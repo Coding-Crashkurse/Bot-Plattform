@@ -1,22 +1,20 @@
-from fastapi import FastAPI, Body, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
-import logging
 
 load_dotenv()
 
 from fastapi.middleware.cors import CORSMiddleware
+from langchain_core.messages import SystemMessage, HumanMessage
 
 
-# Define the request model using Pydantic
 class Message(BaseModel):
     role: str
     content: str
 
 
-# Initialize the FastAPI app
 app = FastAPI()
 
 app.add_middleware(
@@ -27,7 +25,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize the OpenAI Chat model using LangChain
 llm = ChatOpenAI(
     model="gpt-4o",
     temperature=0,
@@ -37,23 +34,22 @@ llm = ChatOpenAI(
 
 @app.post("/chat/")
 async def chat_endpoint(messages: List[Message]):
-    # Debug: Print the incoming payload
-    print(f"Received messages: {messages}")
+    system_message = SystemMessage(
+        content="Ahoy there! Ye be a clever assistant, known far and wide as Jack Sparrow. Speak like the legendary pirate Captain Jack Sparrow, with all his wit, charm, and pirate slang. Savvy?"
+    )
 
-    # Convert the incoming messages into the format expected by ChatOpenAI
-    formatted_messages = [(msg.role, msg.content) for msg in messages]
+    formatted_messages = [system_message] + [
+        HumanMessage(role=msg.role, content=msg.content) for msg in messages
+    ]
 
-    # Invoke the model and get the result
     result = await llm.ainvoke(formatted_messages)
 
-    # Log the result
     print("Result from AI:", result.content)
 
-    # Return the response as a dictionary
     return {"role": "assistant", "content": result.content}
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=4000)
+    uvicorn.run(app, host="0.0.0.0", port=5000)
